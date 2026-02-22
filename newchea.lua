@@ -15,7 +15,7 @@ require('lib.sampfuncs')
 
 -- Версия скрипта (меняйте при каждом обновлении)
 local SCRIPT_VERSION = "1.0.0"
-local GITHUB_RAW_URL = "https://raw.githubusercontent.com/ВАШ_АККАУНТ/ВАШ_РЕПОЗИТОРИЙ/main/newchea.lua"
+local GITHUB_RAW_URL = "https://raw.githubusercontent.com/sliversayz/newpivko/refs/heads/main/newchea.lua"
 local GITHUB_VERSION_URL = "https://raw.githubusercontent.com/sliversayz/newpivko/refs/heads/main/version.txt"
 
 -- Глобальные переменные
