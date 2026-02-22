@@ -14,7 +14,7 @@ require('lib.moonloader')
 require('lib.sampfuncs')
 
 -- Версия скрипта (меняйте при каждом обновлении)
-local SCRIPT_VERSION = "1.0.1"
+local SCRIPT_VERSION = "1.0.2"
 local GITHUB_RAW_URL = "https://raw.githubusercontent.com/sliversayz/newpivko/refs/heads/main/newchea.lua"
 local GITHUB_VERSION_URL = "https://raw.githubusercontent.com/sliversayz/newpivko/refs/heads/main/version.txt"
 
@@ -707,3 +707,4 @@ function setDuckTrackerTheme()
     style.ItemSpacing       = imgui.ImVec2(9, 7)
     style.ItemInnerSpacing  = imgui.ImVec2(7, 5)
 end
+
