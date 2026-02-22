@@ -13,27 +13,27 @@ local json = require('dkjson')
 require('lib.moonloader')
 require('lib.sampfuncs')
 
--- Версия скрипта (меняйте при каждом обновлении)
+-- Р’РµСЂСЃРёСЏ СЃРєСЂРёРїС‚Р° (РјРµРЅСЏР№С‚Рµ РїСЂРё РєР°Р¶РґРѕРј РѕР±РЅРѕРІР»РµРЅРёРё)
 local SCRIPT_VERSION = "1.0.1"
 local GITHUB_RAW_URL = "https://raw.githubusercontent.com/sliversayz/newpivko/refs/heads/main/newchea.lua"
 local GITHUB_VERSION_URL = "https://raw.githubusercontent.com/sliversayz/newpivko/refs/heads/main/version.txt"
 
--- Глобальные переменные
+-- Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ РїРµСЂРµРјРµРЅРЅС‹Рµ
 local mainFont = nil
-local WinState = imgui.new.bool(false)          -- главное меню
-local RouteSelectState = imgui.new.bool(false)   -- окно выбора маршрута
+local WinState = imgui.new.bool(false)          -- РіР»Р°РІРЅРѕРµ РјРµРЅСЋ
+local RouteSelectState = imgui.new.bool(false)   -- РѕРєРЅРѕ РІС‹Р±РѕСЂР° РјР°СЂС€СЂСѓС‚Р°
 
--- Переменные для бота
+-- РџРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ Р±РѕС‚Р°
 local botActive = false
 local currentRoute = nil   -- "ferma1", "ferma2", "zavod"
 local svobodnayaRuka = false
 
--- Переменные для дополнительных функций
+-- РџРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹С… С„СѓРЅРєС†РёР№
 local antiDropObjectActive = imgui.new.bool(false)
 local antiBhActive = imgui.new.bool(false)
-local autoYActive = imgui.new.bool(false)  -- новый чекбокс для Auto Y
+local autoYActive = imgui.new.bool(false)  -- РЅРѕРІС‹Р№ С‡РµРєР±РѕРєСЃ РґР»СЏ Auto Y
 
--- Переменные для автообновления
+-- РџРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ Р°РІС‚РѕРѕР±РЅРѕРІР»РµРЅРёСЏ
 local updateAvailable = false
 local updateChecked = false
 local updateProgress = 0
@@ -41,7 +41,7 @@ local downloading = false
 local downloadSuccess = false
 local downloadError = nil
 
--- Переменные для Auto Y
+-- РџРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ Auto Y
 local autoYState = false
 
 local player = {
@@ -50,7 +50,7 @@ local player = {
     z = 0.0
 }
 
--- Координаты для Ферма 1 (каменщик)
+-- РљРѕРѕСЂРґРёРЅР°С‚С‹ РґР»СЏ Р¤РµСЂРјР° 1 (РєР°РјРµРЅС‰РёРє)
 local points_ferma1 = {
     {1658.3875, 692.3926},
     {1611.6863, 684.2416},
@@ -63,7 +63,7 @@ local points_ferma1 = {
     {1658.3875, 692.3926}
 }
 
--- Координаты для Ферма 2 (оригинальная ферма)
+-- РљРѕРѕСЂРґРёРЅР°С‚С‹ РґР»СЏ Р¤РµСЂРјР° 2 (РѕСЂРёРіРёРЅР°Р»СЊРЅР°СЏ С„РµСЂРјР°)
 local points_ferma2 = {
     {-1074.4659, -1027.3458},
     {-1075.4976, -837.4217},
@@ -76,7 +76,7 @@ local points_ferma2 = {
     {-1074.4659, -1027.3458}
 }
 
--- Координаты для Завода (с паузой 17 сек)
+-- РљРѕРѕСЂРґРёРЅР°С‚С‹ РґР»СЏ Р—Р°РІРѕРґР° (СЃ РїР°СѓР·РѕР№ 17 СЃРµРє)
 local points_zavod_part1 = {
     {-2916.7700,-1202.0148},
     {-2924.9961,-1204.5250},
@@ -92,13 +92,13 @@ local points_zavod_part2 = {
     {-2911.6284,-1176.1685},
     {-2914.5459,-1195.3065}
 }
-local ZAVOD_PAUSE = 20000 -- миллисекунд
+local ZAVOD_PAUSE = 20000 -- РјРёР»Р»РёСЃРµРєСѓРЅРґ
 
 function sendMessage(msg)
-    sampAddChatMessage("[{0395fb}БОТ{FFFFFF}]: "..msg, -1)
+    sampAddChatMessage("[{0395fb}Р‘РћРў{FFFFFF}]: "..msg, -1)
 end
 
--- Функция проверки обновлений
+-- Р¤СѓРЅРєС†РёСЏ РїСЂРѕРІРµСЂРєРё РѕР±РЅРѕРІР»РµРЅРёР№
 function checkForUpdates()
     if updateChecked then return end
     updateChecked = true
@@ -109,20 +109,20 @@ function checkForUpdates()
             local localVersion = versionFile:read("*all"):gsub("%s+", "")
             versionFile:close()
             
-            -- Загружаем версию с GitHub
+            -- Р—Р°РіСЂСѓР¶Р°РµРј РІРµСЂСЃРёСЋ СЃ GitHub
             local response, status = https.request(GITHUB_VERSION_URL)
             if status == 200 then
                 local remoteVersion = response:gsub("%s+", "")
                 if remoteVersion ~= localVersion then
                     updateAvailable = true
-                    sendMessage("Доступно обновление! Версия: " .. remoteVersion)
+                    sendMessage("Р”РѕСЃС‚СѓРїРЅРѕ РѕР±РЅРѕРІР»РµРЅРёРµ! Р’РµСЂСЃРёСЏ: " .. remoteVersion)
                 end
             end
         end
     end)
 end
 
--- Функция скачивания обновления
+-- Р¤СѓРЅРєС†РёСЏ СЃРєР°С‡РёРІР°РЅРёСЏ РѕР±РЅРѕРІР»РµРЅРёСЏ
 function downloadUpdate()
     if downloading then return end
     downloading = true
@@ -130,15 +130,15 @@ function downloadUpdate()
     downloadError = nil
     
     lua_thread.create(function()
-        -- Скачиваем новый скрипт
+        -- РЎРєР°С‡РёРІР°РµРј РЅРѕРІС‹Р№ СЃРєСЂРёРїС‚
         local response, status = https.request(GITHUB_RAW_URL)
         
         if status == 200 then
-            -- Создаём бэкап текущего скрипта
+            -- РЎРѕР·РґР°С‘Рј Р±СЌРєР°Рї С‚РµРєСѓС‰РµРіРѕ СЃРєСЂРёРїС‚Р°
             local scriptPath = debug.getinfo(1).source:gsub("@", "")
             local backupPath = scriptPath:gsub("%.lua$", "_backup.lua")
             
-            -- Копируем текущий файл в бэкап
+            -- РљРѕРїРёСЂСѓРµРј С‚РµРєСѓС‰РёР№ С„Р°Р№Р» РІ Р±СЌРєР°Рї
             local currentFile = io.open(scriptPath, "r")
             if currentFile then
                 local backupFile = io.open(backupPath, "w")
@@ -149,25 +149,25 @@ function downloadUpdate()
                 currentFile:close()
             end
             
-            -- Сохраняем новый скрипт
+            -- РЎРѕС…СЂР°РЅСЏРµРј РЅРѕРІС‹Р№ СЃРєСЂРёРїС‚
             local newFile = io.open(scriptPath, "w")
             if newFile then
                 newFile:write(response)
                 newFile:close()
                 downloadSuccess = true
-                sendMessage("Обновление загружено! Перезапустите скрипт.")
+                sendMessage("РћР±РЅРѕРІР»РµРЅРёРµ Р·Р°РіСЂСѓР¶РµРЅРѕ! РџРµСЂРµР·Р°РїСѓСЃС‚РёС‚Рµ СЃРєСЂРёРїС‚.")
                 
-                -- Обновляем файл версии
+                -- РћР±РЅРѕРІР»СЏРµРј С„Р°Р№Р» РІРµСЂСЃРёРё
                 local versionFile = io.open("version.txt", "w")
                 if versionFile then
                     versionFile:write(SCRIPT_VERSION)
                     versionFile:close()
                 end
             else
-                downloadError = "Не удалось сохранить файл"
+                downloadError = "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРѕС…СЂР°РЅРёС‚СЊ С„Р°Р№Р»"
             end
         else
-            downloadError = "Ошибка загрузки: " .. tostring(status)
+            downloadError = "РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё: " .. tostring(status)
         end
         
         downloading = false
@@ -186,7 +186,7 @@ imgui.OnInitialize(function()
     
     setDuckTrackerTheme()
     
-    -- Проверяем обновления при инициализации
+    -- РџСЂРѕРІРµСЂСЏРµРј РѕР±РЅРѕРІР»РµРЅРёСЏ РїСЂРё РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
     checkForUpdates()
 end)
 
@@ -197,48 +197,48 @@ imgui.OnFrame(function() return WinState[0] end, function()
         imgui.PushFont(mainFont)
     end
     
-    -- Главное окно меню
+    -- Р“Р»Р°РІРЅРѕРµ РѕРєРЅРѕ РјРµРЅСЋ
     imgui.SetNextWindowPos(imgui.ImVec2(900, 500), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
     imgui.SetNextWindowSize(imgui.ImVec2(500, 550), imgui.Cond.Always)
-    imgui.Begin(u8'МЕНЮ БОТА', WinState, imgui.WindowFlags.NoResize)
+    imgui.Begin(u8'РњР•РќР® Р‘РћРўРђ', WinState, imgui.WindowFlags.NoResize)
     
     if imgui.BeginTabBar('MainTabs') then
-        -- Вкладка "Главная"
-        if imgui.BeginTabItem(u8' Главная') then
-            imgui.TextColored(imgui.ImVec4(1.00, 0.08, 0.37, 1.00), u8' Управление ботами')
+        -- Р’РєР»Р°РґРєР° "Р“Р»Р°РІРЅР°СЏ"
+        if imgui.BeginTabItem(u8' Р“Р»Р°РІРЅР°СЏ') then
+            imgui.TextColored(imgui.ImVec4(1.00, 0.08, 0.37, 1.00), u8' РЈРїСЂР°РІР»РµРЅРёРµ Р±РѕС‚Р°РјРё')
             imgui.Separator()
             imgui.Spacing()
             
-            -- Кнопка открытия окна выбора маршрута
-            if imgui.Button(u8' Bot Маршруты', imgui.ImVec2(200, 40)) then
+            -- РљРЅРѕРїРєР° РѕС‚РєСЂС‹С‚РёСЏ РѕРєРЅР° РІС‹Р±РѕСЂР° РјР°СЂС€СЂСѓС‚Р°
+            if imgui.Button(u8' Bot РњР°СЂС€СЂСѓС‚С‹', imgui.ImVec2(200, 40)) then
                 RouteSelectState[0] = true
             end
             
-            -- Отображение статуса активного бота
+            -- РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃС‚Р°С‚СѓСЃР° Р°РєС‚РёРІРЅРѕРіРѕ Р±РѕС‚Р°
             if botActive then
                 local routeName = ""
-                if currentRoute == "ferma1" then routeName = "Ферма 1"
-                elseif currentRoute == "ferma2" then routeName = "Ферма 2"
-                elseif currentRoute == "zavod" then routeName = "Завод"
+                if currentRoute == "ferma1" then routeName = "Р¤РµСЂРјР° 1"
+                elseif currentRoute == "ferma2" then routeName = "Р¤РµСЂРјР° 2"
+                elseif currentRoute == "zavod" then routeName = "Р—Р°РІРѕРґ"
                 end
                 imgui.Spacing()
-                imgui.Text(u8'Активный бот: ' .. routeName)
-                if imgui.Button(u8' Остановить бота', imgui.ImVec2(200, 30)) then
+                imgui.Text(u8'РђРєС‚РёРІРЅС‹Р№ Р±РѕС‚: ' .. routeName)
+                if imgui.Button(u8' РћСЃС‚Р°РЅРѕРІРёС‚СЊ Р±РѕС‚Р°', imgui.ImVec2(200, 30)) then
                     botActive = false
                     currentRoute = nil
-                    sendMessage('Бот остановлен')
+                    sendMessage('Р‘РѕС‚ РѕСЃС‚Р°РЅРѕРІР»РµРЅ')
                 end
             else
                 imgui.Spacing()
-                imgui.Text(u8'Бот не активен')
+                imgui.Text(u8'Р‘РѕС‚ РЅРµ Р°РєС‚РёРІРµРЅ')
             end
             
             imgui.EndTabItem()
         end
         
-        -- Вкладка "Дополнительно" с новым чекбоксом Auto Y
-        if imgui.BeginTabItem(u8' Дополнительно') then
-            imgui.TextColored(imgui.ImVec4(1.00, 0.08, 0.37, 1.00), u8' Дополнительные функции')
+        -- Р’РєР»Р°РґРєР° "Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ" СЃ РЅРѕРІС‹Рј С‡РµРєР±РѕРєСЃРѕРј Auto Y
+        if imgui.BeginTabItem(u8' Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕ') then
+            imgui.TextColored(imgui.ImVec4(1.00, 0.08, 0.37, 1.00), u8' Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё')
             imgui.Separator()
             imgui.Spacing()
             
@@ -246,56 +246,56 @@ imgui.OnFrame(function() return WinState[0] end, function()
             imgui.Spacing()
             imgui.Checkbox(u8'AntiBunnyHop (AntiBH)', antiBhActive)
             imgui.Spacing()
-            imgui.Checkbox(u8'Auto Y', autoYActive)  -- новый чекбокс
+            imgui.Checkbox(u8'Auto Y', autoYActive)  -- РЅРѕРІС‹Р№ С‡РµРєР±РѕРєСЃ
             
-            -- Отображение статуса Auto Y
+            -- РћС‚РѕР±СЂР°Р¶РµРЅРёРµ СЃС‚Р°С‚СѓСЃР° Auto Y
             if autoYActive and autoYActive[0] then
                 imgui.SameLine()
-                imgui.TextColored(imgui.ImVec4(0.00, 1.00, 0.00, 1.00), u8'  (Активен)')
+                imgui.TextColored(imgui.ImVec4(0.00, 1.00, 0.00, 1.00), u8'  (РђРєС‚РёРІРµРЅ)')
             end
             
             imgui.EndTabItem()
         end
         
-        -- Вкладка "Обновления"
-        if imgui.BeginTabItem(u8' Обновления') then
-            imgui.TextColored(imgui.ImVec4(1.00, 0.08, 0.37, 1.00), u8' Автообновление')
+        -- Р’РєР»Р°РґРєР° "РћР±РЅРѕРІР»РµРЅРёСЏ"
+        if imgui.BeginTabItem(u8' РћР±РЅРѕРІР»РµРЅРёСЏ') then
+            imgui.TextColored(imgui.ImVec4(1.00, 0.08, 0.37, 1.00), u8' РђРІС‚РѕРѕР±РЅРѕРІР»РµРЅРёРµ')
             imgui.Separator()
             imgui.Spacing()
             
-            imgui.Text(u8'Текущая версия: ' .. SCRIPT_VERSION)
+            imgui.Text(u8'РўРµРєСѓС‰Р°СЏ РІРµСЂСЃРёСЏ: ' .. SCRIPT_VERSION)
             imgui.Spacing()
             
             if updateAvailable then
-                imgui.TextColored(imgui.ImVec4(0.00, 1.00, 0.00, 1.00), u8'Доступно обновление!')
+                imgui.TextColored(imgui.ImVec4(0.00, 1.00, 0.00, 1.00), u8'Р”РѕСЃС‚СѓРїРЅРѕ РѕР±РЅРѕРІР»РµРЅРёРµ!')
                 imgui.Spacing()
                 
                 if downloading then
-                    imgui.Text(u8'Загрузка: ' .. updateProgress .. '%')
+                    imgui.Text(u8'Р—Р°РіСЂСѓР·РєР°: ' .. updateProgress .. '%')
                     imgui.Spacing()
                 elseif downloadSuccess then
-                    imgui.TextColored(imgui.ImVec4(0.00, 1.00, 0.00, 1.00), u8'Обновление загружено!')
-                    imgui.Text(u8'Перезапустите скрипт')
+                    imgui.TextColored(imgui.ImVec4(0.00, 1.00, 0.00, 1.00), u8'РћР±РЅРѕРІР»РµРЅРёРµ Р·Р°РіСЂСѓР¶РµРЅРѕ!')
+                    imgui.Text(u8'РџРµСЂРµР·Р°РїСѓСЃС‚РёС‚Рµ СЃРєСЂРёРїС‚')
                 elseif downloadError then
-                    imgui.TextColored(imgui.ImVec4(1.00, 0.00, 0.00, 1.00), u8'Ошибка: ' .. downloadError)
+                    imgui.TextColored(imgui.ImVec4(1.00, 0.00, 0.00, 1.00), u8'РћС€РёР±РєР°: ' .. downloadError)
                     imgui.Spacing()
-                    if imgui.Button(u8'Повторить', imgui.ImVec2(150, 30)) then
+                    if imgui.Button(u8'РџРѕРІС‚РѕСЂРёС‚СЊ', imgui.ImVec2(150, 30)) then
                         downloadUpdate()
                     end
                 else
-                    if imgui.Button(u8'Скачать обновление', imgui.ImVec2(200, 40)) then
+                    if imgui.Button(u8'РЎРєР°С‡Р°С‚СЊ РѕР±РЅРѕРІР»РµРЅРёРµ', imgui.ImVec2(200, 40)) then
                         downloadUpdate()
                     end
                 end
             else
                 if updateChecked then
-                    imgui.Text(u8'У вас актуальная версия')
+                    imgui.Text(u8'РЈ РІР°СЃ Р°РєС‚СѓР°Р»СЊРЅР°СЏ РІРµСЂСЃРёСЏ')
                 else
-                    imgui.Text(u8'Проверка обновлений...')
+                    imgui.Text(u8'РџСЂРѕРІРµСЂРєР° РѕР±РЅРѕРІР»РµРЅРёР№...')
                 end
                 
                 imgui.Spacing()
-                if imgui.Button(u8'Проверить обновления', imgui.ImVec2(200, 30)) then
+                if imgui.Button(u8'РџСЂРѕРІРµСЂРёС‚СЊ РѕР±РЅРѕРІР»РµРЅРёСЏ', imgui.ImVec2(200, 30)) then
                     updateChecked = false
                     checkForUpdates()
                 end
@@ -308,17 +308,17 @@ imgui.OnFrame(function() return WinState[0] end, function()
     end
     imgui.End()
     
-    -- Окно выбора маршрута
+    -- РћРєРЅРѕ РІС‹Р±РѕСЂР° РјР°СЂС€СЂСѓС‚Р°
     if RouteSelectState[0] then
         imgui.SetNextWindowSize(imgui.ImVec2(300, 250), imgui.Cond.Always)
         imgui.SetNextWindowPos(imgui.ImVec2(950, 550), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-        imgui.Begin(u8'Выбор маршрута', RouteSelectState, imgui.WindowFlags.NoResize)
+        imgui.Begin(u8'Р’С‹Р±РѕСЂ РјР°СЂС€СЂСѓС‚Р°', RouteSelectState, imgui.WindowFlags.NoResize)
         
-        imgui.Text(u8'Выберите маршрут:')
+        imgui.Text(u8'Р’С‹Р±РµСЂРёС‚Рµ РјР°СЂС€СЂСѓС‚:')
         imgui.Spacing()
         
-        -- Кнопка Ферма 1
-        if imgui.Button(u8'Ферма 1', imgui.ImVec2(250, 40)) then
+        -- РљРЅРѕРїРєР° Р¤РµСЂРјР° 1
+        if imgui.Button(u8'Р¤РµСЂРјР° 1', imgui.ImVec2(250, 40)) then
             if botActive and currentRoute ~= "ferma1" then
                 botActive = false
                 currentRoute = nil
@@ -327,20 +327,20 @@ imgui.OnFrame(function() return WinState[0] end, function()
             if not botActive then
                 botActive = true
                 currentRoute = "ferma1"
-                sendMessage('Ферма 1 - Работаем')
+                sendMessage('Р¤РµСЂРјР° 1 - Р Р°Р±РѕС‚Р°РµРј')
                 startBot(points_ferma1)
             elseif currentRoute == "ferma1" then
                 botActive = false
                 currentRoute = nil
-                sendMessage('Ферма 1 - Остановлен')
+                sendMessage('Р¤РµСЂРјР° 1 - РћСЃС‚Р°РЅРѕРІР»РµРЅ')
             end
             RouteSelectState[0] = false
         end
         
         imgui.Spacing()
         
-        -- Кнопка Ферма 2
-        if imgui.Button(u8'Ферма 2', imgui.ImVec2(250, 40)) then
+        -- РљРЅРѕРїРєР° Р¤РµСЂРјР° 2
+        if imgui.Button(u8'Р¤РµСЂРјР° 2', imgui.ImVec2(250, 40)) then
             if botActive and currentRoute ~= "ferma2" then
                 botActive = false
                 currentRoute = nil
@@ -349,20 +349,20 @@ imgui.OnFrame(function() return WinState[0] end, function()
             if not botActive then
                 botActive = true
                 currentRoute = "ferma2"
-                sendMessage('Ферма 2 - Работаем')
+                sendMessage('Р¤РµСЂРјР° 2 - Р Р°Р±РѕС‚Р°РµРј')
                 startBot(points_ferma2)
             elseif currentRoute == "ferma2" then
                 botActive = false
                 currentRoute = nil
-                sendMessage('Ферма 2 - Остановлен')
+                sendMessage('Р¤РµСЂРјР° 2 - РћСЃС‚Р°РЅРѕРІР»РµРЅ')
             end
             RouteSelectState[0] = false
         end
         
         imgui.Spacing()
         
-        -- Кнопка Завод
-        if imgui.Button(u8'Завод', imgui.ImVec2(250, 40)) then
+        -- РљРЅРѕРїРєР° Р—Р°РІРѕРґ
+        if imgui.Button(u8'Р—Р°РІРѕРґ', imgui.ImVec2(250, 40)) then
             if botActive and currentRoute ~= "zavod" then
                 botActive = false
                 currentRoute = nil
@@ -371,12 +371,12 @@ imgui.OnFrame(function() return WinState[0] end, function()
             if not botActive then
                 botActive = true
                 currentRoute = "zavod"
-                sendMessage('Завод - Работаем')
+                sendMessage('Р—Р°РІРѕРґ - Р Р°Р±РѕС‚Р°РµРј')
                 startZavodBot()
             elseif currentRoute == "zavod" then
                 botActive = false
                 currentRoute = nil
-                sendMessage('Завод - Остановлен')
+                sendMessage('Р—Р°РІРѕРґ - РћСЃС‚Р°РЅРѕРІР»РµРЅ')
             end
             RouteSelectState[0] = false
         end
@@ -389,7 +389,7 @@ imgui.OnFrame(function() return WinState[0] end, function()
     end
 end)
 
--- Общая функция для обычных маршрутов (без паузы)
+-- РћР±С‰Р°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ РѕР±С‹С‡РЅС‹С… РјР°СЂС€СЂСѓС‚РѕРІ (Р±РµР· РїР°СѓР·С‹)
 function followPath(points)
     local i = 1
     local xAngle = -0.1
@@ -455,7 +455,7 @@ function startBot(points)
     end)
 end
 
--- Специальная функция для завода с паузой
+-- РЎРїРµС†РёР°Р»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ РґР»СЏ Р·Р°РІРѕРґР° СЃ РїР°СѓР·РѕР№
 function startZavodBot()
     lua_thread.create(function()
         pcall(function() writeMemory(7634870, 1, 1, 1) end)
@@ -465,7 +465,7 @@ function startZavodBot()
         wait(100)
         
         while botActive do
-            -- Первая часть маршрута
+            -- РџРµСЂРІР°СЏ С‡Р°СЃС‚СЊ РјР°СЂС€СЂСѓС‚Р°
             for i = 1, #points_zavod_part1 do
                 if not botActive then break end
                 local tox, toy = points_zavod_part1[i][1], points_zavod_part1[i][2]
@@ -497,17 +497,17 @@ function startZavodBot()
                 end
             end
             
-            -- Пауза 20 секунд
+            -- РџР°СѓР·Р° 20 СЃРµРєСѓРЅРґ
             if botActive then
-                sendMessage('Пауза 20 секунд...')
+                sendMessage('РџР°СѓР·Р° 20 СЃРµРєСѓРЅРґ...')
                 local pauseStart = os.clock()
                 while botActive and (os.clock() - pauseStart) * 1000 < ZAVOD_PAUSE do
                     wait(0)
                 end
-                sendMessage('Продолжаем')
+                sendMessage('РџСЂРѕРґРѕР»Р¶Р°РµРј')
             end
             
-            -- Вторая часть маршрута
+            -- Р’С‚РѕСЂР°СЏ С‡Р°СЃС‚СЊ РјР°СЂС€СЂСѓС‚Р°
             for i = 1, #points_zavod_part2 do
                 if not botActive then break end
                 local tox, toy = points_zavod_part2[i][1], points_zavod_part2[i][2]
@@ -552,7 +552,7 @@ function sendKey(code, scode, key)
 end
 
 function sampev.onSendPlayerSync(data)
-    -- Для бота-маршрута (старая логика)
+    -- Р”Р»СЏ Р±РѕС‚Р°-РјР°СЂС€СЂСѓС‚Р° (СЃС‚Р°СЂР°СЏ Р»РѕРіРёРєР°)
     if data and botActive then
         if bit.band(data.keysData, 0x28) == 0x28 then
             data.keysData = bit.bxor(data.keysData, 0x20)
@@ -581,7 +581,7 @@ function sampev.onSetPlayerSpecialAction()
     return true
 end
 
--- Функция для обработки пакетов Auto Y
+-- Р¤СѓРЅРєС†РёСЏ РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё РїР°РєРµС‚РѕРІ Auto Y
 function sampev.onReceivePacket(id, bs)
     if id == 215 and autoYActive and autoYActive[0] then
         raknetBitStreamReadInt8(bs)
@@ -607,15 +607,15 @@ function sampev.onReceivePacket(id, bs)
     end
 end
 
--- Основной цикл для Auto Y
+-- РћСЃРЅРѕРІРЅРѕР№ С†РёРєР» РґР»СЏ Auto Y
 function main()
     wait(1000)
     if not isSampLoaded() or not isSampfuncsLoaded() then return end
     while not isSampAvailable() do wait(100) end
     
-    sampAddChatMessage('{32CD32}[BotMenu] {E0FFFF}загружен! F5', -1)
+    sampAddChatMessage('{32CD32}[BotMenu] {E0FFFF}Р·Р°РіСЂСѓР¶РµРЅ! F5', -1)
     
-    -- Поток для Auto Y
+    -- РџРѕС‚РѕРє РґР»СЏ Auto Y
     lua_thread.create(function()
         while true do
             wait(0)
