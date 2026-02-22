@@ -8,13 +8,13 @@ encoding.default = 'CP1251'
 local u8 = encoding.UTF8
 local ffi = require 'ffi'
 local new = imgui.new
-local https = require('ssl.https') -- для загрузки с GitHub
-local json = require('dkjson') -- для парсинга JSON (если нужно)
+local https = require('ssl.https')
+local json = require('dkjson')
 require('lib.moonloader')
 require('lib.sampfuncs')
 
 -- Версия скрипта (меняйте при каждом обновлении)
-local SCRIPT_VERSION = "1.0.0"
+local SCRIPT_VERSION = "1.0.1"
 local GITHUB_RAW_URL = "https://raw.githubusercontent.com/sliversayz/newpivko/refs/heads/main/newchea.lua"
 local GITHUB_VERSION_URL = "https://raw.githubusercontent.com/sliversayz/newpivko/refs/heads/main/version.txt"
 
@@ -31,6 +31,7 @@ local svobodnayaRuka = false
 -- Переменные для дополнительных функций
 local antiDropObjectActive = imgui.new.bool(false)
 local antiBhActive = imgui.new.bool(false)
+local autoYActive = imgui.new.bool(false)  -- новый чекбокс для Auto Y
 
 -- Переменные для автообновления
 local updateAvailable = false
@@ -39,6 +40,9 @@ local updateProgress = 0
 local downloading = false
 local downloadSuccess = false
 local downloadError = nil
+
+-- Переменные для Auto Y
+local autoYState = false
 
 local player = {
     x = 0.0,
@@ -156,8 +160,7 @@ function downloadUpdate()
                 -- Обновляем файл версии
                 local versionFile = io.open("version.txt", "w")
                 if versionFile then
-                    -- Парсим версию из нового скрипта (можно сохранить отдельно)
-                    versionFile:write(SCRIPT_VERSION) -- временно, лучше парсить
+                    versionFile:write(SCRIPT_VERSION)
                     versionFile:close()
                 end
             else
@@ -233,7 +236,7 @@ imgui.OnFrame(function() return WinState[0] end, function()
             imgui.EndTabItem()
         end
         
-        -- Вкладка "Дополнительно"
+        -- Вкладка "Дополнительно" с новым чекбоксом Auto Y
         if imgui.BeginTabItem(u8' Дополнительно') then
             imgui.TextColored(imgui.ImVec4(1.00, 0.08, 0.37, 1.00), u8' Дополнительные функции')
             imgui.Separator()
@@ -242,6 +245,14 @@ imgui.OnFrame(function() return WinState[0] end, function()
             imgui.Checkbox(u8'AntiDropObject', antiDropObjectActive)
             imgui.Spacing()
             imgui.Checkbox(u8'AntiBunnyHop (AntiBH)', antiBhActive)
+            imgui.Spacing()
+            imgui.Checkbox(u8'Auto Y', autoYActive)  -- новый чекбокс
+            
+            -- Отображение статуса Auto Y
+            if autoYActive and autoYActive[0] then
+                imgui.SameLine()
+                imgui.TextColored(imgui.ImVec4(0.00, 1.00, 0.00, 1.00), u8'  (Активен)')
+            end
             
             imgui.EndTabItem()
         end
@@ -361,7 +372,7 @@ imgui.OnFrame(function() return WinState[0] end, function()
                 botActive = true
                 currentRoute = "zavod"
                 sendMessage('Завод - Работаем')
-                startZavodBot()   -- специальная функция для завода с паузой
+                startZavodBot()
             elseif currentRoute == "zavod" then
                 botActive = false
                 currentRoute = nil
@@ -463,8 +474,6 @@ function startZavodBot()
                     player.x, player.y, player.z = x, y, z
                 end
                 
-                -- Используем followPath для одной точки? Нет, тут нужен runToPoint или свой цикл
-                -- Упростим: используем локальный цикл движения для одной точки
                 local xAngle = -0.1
                 local targetAngle = getHeadingFromVector2d(tox - player.x, toy - player.y)
                 setCameraPositionUnfixed(xAngle, math.rad(targetAngle - 90))
@@ -572,12 +581,52 @@ function sampev.onSetPlayerSpecialAction()
     return true
 end
 
+-- Функция для обработки пакетов Auto Y
+function sampev.onReceivePacket(id, bs)
+    if id == 215 and autoYActive and autoYActive[0] then
+        raknetBitStreamReadInt8(bs)
+        local fff = raknetBitStreamReadInt16(bs)
+        raknetBitStreamReadInt32(bs)
+        local max = raknetBitStreamReadInt8(bs)
+        if max ~= nil and fff == 2 then
+            local e = {}
+            for i = 1, max do
+                local l = raknetBitStreamReadInt32(bs)
+                local taxt = raknetBitStreamReadString(bs, l)
+                if taxt ~= nil and taxt ~= "" then
+                    table.insert(e, taxt)
+                end
+            end
+            local text = table.concat(e)
+            if (text:find("interface%(\'ProgressBar\'%)")) then
+                autoYState = true
+            elseif (text == "ProgressBar") then
+                autoYState = false
+            end
+        end
+    end
+end
+
+-- Основной цикл для Auto Y
 function main()
     wait(1000)
     if not isSampLoaded() or not isSampfuncsLoaded() then return end
     while not isSampAvailable() do wait(100) end
     
     sampAddChatMessage('{32CD32}[BotMenu] {E0FFFF}загружен! F5', -1)
+    
+    -- Поток для Auto Y
+    lua_thread.create(function()
+        while true do
+            wait(0)
+            if autoYActive and autoYActive[0] and autoYState then
+                wait(325)
+                setVirtualKeyDown(0x59, true)  -- Y
+                wait(425)
+                setVirtualKeyDown(0x59, false)
+            end
+        end
+    end)
     
     while true do
         wait(0)
